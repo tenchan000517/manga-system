@@ -1,16 +1,1 @@
-{
-  "version": 2,
-  "name": "instagram-manga-generator",
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
-}
+{}
