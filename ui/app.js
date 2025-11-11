@@ -321,7 +321,7 @@ async function loadCharacterImages(characterInfos) {
 
     for (const charInfo of characterInfos) {
         const charName = charInfo.name.toUpperCase().replace(/\s+/g, '');
-        const imagePath = `public/characters/${charName}_ORIGIN.png`;
+        const imagePath = `assets/characters/${charName}_ORIGIN.png`;
 
         try {
             const response = await fetch(imagePath);
