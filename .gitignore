@@ -1,0 +1,17 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+output/
+temp/
+*.png
+*.jpg
+*.jpeg
+!characters/*.png
+.DS_Store
+venv/
+venv_win/
+env/
+docs/

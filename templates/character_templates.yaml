@@ -1,0 +1,44 @@
+# キャラクター情報テンプレート
+# 全てのマンガ生成で共通使用
+
+character_infos:
+  - name: "TEN"
+    base_prompt: |-
+      A young male engineer character in chibi/deformed anime style.
+      - Black messy hair with bangs
+      - Round black-framed glasses
+      - Black t-shirt and blue jeans
+      - Casual, friendly appearance
+      - Chibi proportions (large head, small body)
+      - Expressive eyes visible through glasses
+      This is a consistent character design that must be maintained across all panels.
+
+  - name: "CLAUDECODE"
+    base_prompt: |-
+      A cute robot character in chibi/deformed anime style wearing an astronaut suit.
+      - White/silver astronaut helmet and suit
+      - Orange circular face panel (like a visor)
+      - Blue accents on the body
+      - Small, round body with short limbs
+      - Cable/cord extending from the back like a tail
+      - Friendly, helpful appearance
+      - Chibi proportions
+      This is a consistent character design that must be maintained across all panels.
+
+# 感情表現のバリエーション（参考）
+emotion_variations:
+  TEN:
+    - 通常: "neutral, calm expression"
+    - 悩み: "troubled, thinking hard, hand on chin"
+    - 驚き: "surprised, eyes wide, mouth open"
+    - 喜び: "happy, smiling brightly, excited"
+    - 決意: "determined, confident, fist clenched"
+    - 説明: "explaining, pointing, gesturing"
+
+  CLAUDECODE:
+    - 通常: "neutral, standing ready"
+    - 提案: "suggesting, one finger raised, helpful gesture"
+    - 作業中: "working, focused, typing gesture"
+    - 発見: "excited discovery, both hands raised"
+    - 承認: "thumbs up, approving gesture"
+    - 説明: "explaining, gesturing, helpful pose"
