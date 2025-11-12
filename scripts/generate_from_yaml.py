@@ -93,15 +93,125 @@ def image_to_base64(image_path):
     with open(image_path, 'rb') as f:
         return base64.b64encode(f.read()).decode('utf-8')
 
-def load_character_image(character_name):
-    """キャラクター画像を読み込む"""
-    # スペースを削除してファイル名を生成
-    char_name_clean = character_name.upper().replace(" ", "")
-    char_path = CHARACTERS_DIR / f"{char_name_clean}_ORIGIN.png"
-    if not char_path.exists():
-        raise FileNotFoundError(f"キャラクター画像が見つかりません: {char_path}")
+def load_layout_reference_image(layout_pattern):
+    """レイアウトパターンの参照画像を読み込む
 
-    return Image.open(char_path)
+    Args:
+        layout_pattern: レイアウトパターン名（例: "pattern_4panel_equal"）
+
+    Returns:
+        Image or None: レイアウト参照画像（見つからない場合はNone）
+    """
+    # layout_patterns.yamlを読み込んで参照画像パスを取得
+    layout_patterns_path = TEMPLATES_DIR / "layout_patterns.yaml"
+    if not layout_patterns_path.exists():
+        print(f"  ⚠ layout_patterns.yaml が見つかりません")
+        return None
+
+    with open(layout_patterns_path, 'r', encoding='utf-8') as f:
+        layout_patterns = yaml.safe_load(f)
+
+    pattern_data = layout_patterns.get(layout_pattern)
+    if not pattern_data:
+        print(f"  ⚠ レイアウトパターン '{layout_pattern}' が見つかりません")
+        return None
+
+    ref_image_name = pattern_data.get('reference_image')
+    if not ref_image_name:
+        print(f"  ⚠ レイアウトパターン '{layout_pattern}' に reference_image が定義されていません")
+        return None
+
+    # ui/assets/layout/ 配下を探す
+    ref_image_path = PROJECT_ROOT / "ui" / "assets" / "layout" / ref_image_name
+    if not ref_image_path.exists():
+        print(f"  ⚠ レイアウト参照画像が見つかりません: {ref_image_path}")
+        return None
+
+    return Image.open(ref_image_path)
+
+def load_character_emotion_image(character_name, emotion):
+    """キャラクターの感情別参照画像を読み込む
+
+    Args:
+        character_name: キャラクター名（例: "TEN"）
+        emotion: 感情（例: "悩み"）
+
+    Returns:
+        Image or None: キャラクター参照画像（見つからない場合はNone）
+    """
+    # character_templates.yamlを読み込んで参照画像パスを取得
+    char_templates_path = TEMPLATES_DIR / "character_templates.yaml"
+    if not char_templates_path.exists():
+        print(f"  ⚠ character_templates.yaml が見つかりません")
+        return None
+
+    with open(char_templates_path, 'r', encoding='utf-8') as f:
+        char_templates = yaml.safe_load(f)
+
+    characters = char_templates.get('characters', {})
+    char_data = characters.get(character_name)
+    if not char_data:
+        print(f"  ⚠ キャラクター '{character_name}' が見つかりません")
+        return None
+
+    emotions_data = char_data.get('emotions', {})
+    emotion_data = emotions_data.get(emotion)
+    if not emotion_data:
+        print(f"  ⚠ キャラクター '{character_name}' の感情 '{emotion}' が見つかりません")
+        return None
+
+    ref_image_name = emotion_data.get('reference_image')
+    if not ref_image_name:
+        print(f"  ⚠ 感情 '{emotion}' に reference_image が定義されていません")
+        return None
+
+    # characters/ 配下を探す
+    ref_image_path = CHARACTERS_DIR / ref_image_name
+    if not ref_image_path.exists():
+        print(f"  ⚠ キャラクター参照画像が見つかりません: {ref_image_path}")
+        return None
+
+    return Image.open(ref_image_path)
+
+def load_tool_image(tool_name):
+    """小物の参照画像を読み込む
+
+    Args:
+        tool_name: 小物名（例: "NOTEPC"）
+
+    Returns:
+        Image or None: 小物参照画像（見つからない場合はNone）
+    """
+    if not tool_name or tool_name.strip() == "":
+        return None
+
+    # character_templates.yamlから小物情報を取得
+    char_templates_path = TEMPLATES_DIR / "character_templates.yaml"
+    if not char_templates_path.exists():
+        print(f"  ⚠ character_templates.yaml が見つかりません")
+        return None
+
+    with open(char_templates_path, 'r', encoding='utf-8') as f:
+        char_templates = yaml.safe_load(f)
+
+    tools = char_templates.get('tools', {})
+    tool_data = tools.get(tool_name)
+    if not tool_data:
+        print(f"  ⚠ 小物 '{tool_name}' が見つかりません")
+        return None
+
+    ref_image_name = tool_data.get('reference_image')
+    if not ref_image_name:
+        print(f"  ⚠ 小物 '{tool_name}' に reference_image が定義されていません")
+        return None
+
+    # reference_image は相対パスなので、PROJECT_ROOT から解決
+    ref_image_path = PROJECT_ROOT / ref_image_name
+    if not ref_image_path.exists():
+        print(f"  ⚠ 小物参照画像が見つかりません: {ref_image_path}")
+        return None
+
+    return Image.open(ref_image_path)
 
 def yaml_to_prompt(comic_page_data):
     """構造化YAMLを詳細なプロンプトに変換"""
@@ -190,8 +300,8 @@ Generate a complete manga page following these specifications:
 {''.join(panel_descriptions)}
 
 IMPORTANT:
-- Use the attached character reference images to maintain consistent character designs
-- Follow the layout constraints strictly
+- Use the attached reference images (layout pattern, character emotions, and tools) to maintain consistency
+- Follow the layout constraints strictly - the panel layout reference image shows the exact panel arrangement
 - Include speech bubbles with the specified dialogue in Japanese
 - Maintain the aspect ratio of 1:1.4 (width:height)
 - Generate the complete page as a single image with all panels
@@ -199,14 +309,18 @@ IMPORTANT:
 
     return full_prompt
 
-def generate_manga_from_yaml(yaml_path, output_filename=None, session_folder=None):
+def generate_manga_from_yaml(yaml_path, output_filename=None, session_folder=None, count=1):
     """YAMLからマンガを生成
 
     Args:
         yaml_path: YAMLファイルのパス
         output_filename: 出力ファイル名（省略可）
         session_folder: セッションフォルダ番号（省略可）
+        count: 生成枚数（1-4、デフォルト1）
     """
+
+    # 生成枚数を1-4の範囲に制限
+    count = max(1, min(count, 4))
 
     # YAML読み込み
     print(f"📖 YAML読み込み: {yaml_path}")
@@ -229,85 +343,161 @@ def generate_manga_from_yaml(yaml_path, output_filename=None, session_folder=Non
 
     model = genai.GenerativeModel(model_name)
 
-    # プロンプト生成
-    print("📝 プロンプト生成中...")
-    prompt = yaml_to_prompt(comic_page)
-    print(f"プロンプト長: {len(prompt)} 文字")
+    # YAMLをそのまま文字列として準備（Easy Banana方式）
+    print("📝 YAML指示文準備中...")
+    with open(yaml_path, 'r', encoding='utf-8') as f:
+        yaml_content = f.read()
 
-    # キャラクター画像を収集
-    print("👤 キャラクター画像読み込み中...")
-    character_infos = comic_page.get('character_infos', [])
-    character_images = []
+    # Easy Banana風のシンプルなシステムプロンプト
+    SYSTEM_PROMPT = ' '.join([
+        'You are an expert image generation assistant.',
+        'Generate one or more high-quality images that match the user\'s prompt.',
+        'Return images inline using inlineData with an appropriate MIME type (prefer image/png).',
+        'If you include text output, keep it to a single concise English caption.',
+        'Do not add disclaimers unless required by safety policies.'
+    ])
 
-    for char_info in character_infos:
-        char_name = char_info['name']
-        try:
-            img = load_character_image(char_name)
-            character_images.append(img)
-            print(f"  ✓ {char_name}")
-        except FileNotFoundError as e:
-            print(f"  ⚠ {e}")
+    prompt = f"{SYSTEM_PROMPT}\n\nUser prompt:\n{yaml_content}"
+    print(f"指示文長: {len(prompt)} 文字")
 
-    # Gemini API呼び出し
-    print("\n🎨 Nanobanana API呼び出し中...")
+    # 参照画像を収集
+    print("🖼️ 参照画像読み込み中...")
+    reference_images = []
+
+    # 1. レイアウトパターンの参照画像
+    # 元のYAMLファイルから layout_pattern を取得
+    yaml_file = Path(yaml_path)
+    original_yaml_path = yaml_file.parent / yaml_file.name.replace('_expanded', '')
+
+    if original_yaml_path.exists():
+        original_data = load_yaml(original_yaml_path)
+        layout_pattern = original_data.get('layout_pattern')
+        if layout_pattern:
+            print(f"  📐 レイアウトパターン: {layout_pattern}")
+            layout_img = load_layout_reference_image(layout_pattern)
+            if layout_img:
+                reference_images.append(layout_img)
+                print(f"    ✓ レイアウト参照画像")
+
+    # 2. 使用されるキャラクターの基本画像を収集（重複なし、感情は使わない）
+    if original_yaml_path.exists():
+        original_data = load_yaml(original_yaml_path)
+        scenes = original_data.get('scenes', [])
+
+        print(f"  👤 キャラクター基本画像:")
+        char_images_added = set()  # 重複チェック用
+
+        for scene in scenes:
+            char_name = scene.get('character')
+
+            # まだ追加していないキャラクターなら追加
+            if char_name not in char_images_added:
+                # _ORIGIN.png を読み込む（感情別ではない）
+                char_name_clean = char_name.upper().replace(" ", "")
+                char_path = CHARACTERS_DIR / f"{char_name_clean}_ORIGIN.png"
+
+                if char_path.exists():
+                    char_img = Image.open(char_path)
+                    reference_images.append(char_img)
+                    print(f"    ✓ {char_name}")
+                    char_images_added.add(char_name)
+                else:
+                    print(f"    ⚠ {char_name}の基本画像が見つかりません: {char_path}")
+
+    # 3. 小物は参照画像として送らない（YAMLの文章で指定）
+    # Easy Banana方式では小物画像は読み込まず、YAMLの記述に任せる
+
+    # Gemini API呼び出し（複数回生成）
+    print(f"\n🎨 Nanobanana API呼び出し中... (生成枚数: {count})")
     print("  （これには数十秒かかる場合があります）")
 
-    try:
-        # 画像 + プロンプトを送信
-        content_parts = character_images + [prompt]
+    generated_paths = []
+    errors = []
 
-        response = model.generate_content(content_parts)
+    for i in range(count):
+        print(f"\n生成中... ({i + 1}/{count})")
+        try:
+            # 参照画像 + プロンプトを送信
+            content_parts = reference_images + [prompt]
 
-        # レスポンスから画像を抽出
-        print("📡 レスポンス受信")
+            response = model.generate_content(content_parts)
 
-        if hasattr(response, 'candidates') and response.candidates:
-            candidate = response.candidates[0]
+            # レスポンスから画像を抽出
+            print("📡 レスポンス受信")
 
-            if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
-                for i, part in enumerate(candidate.content.parts):
-                    if hasattr(part, 'inline_data'):
-                        print("  ✓ 画像データ発見！")
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
 
-                        # デバッグ情報
-                        mime_type = part.inline_data.mime_type if hasattr(part.inline_data, 'mime_type') else 'unknown'
-                        data_type = type(part.inline_data.data).__name__
-                        print(f"  データ形式: {mime_type}, タイプ: {data_type}")
+                if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                    for part in candidate.content.parts:
+                        if hasattr(part, 'inline_data'):
+                            print("  ✓ 画像データ発見！")
 
-                        # データがすでにバイト列かbase64文字列かを判定
-                        if isinstance(part.inline_data.data, bytes):
-                            # バイト列の場合はそのまま使用
-                            image_data = part.inline_data.data
-                        else:
-                            # 文字列の場合はbase64デコード
-                            image_data = base64.b64decode(part.inline_data.data)
+                            # デバッグ情報
+                            mime_type = part.inline_data.mime_type if hasattr(part.inline_data, 'mime_type') else 'unknown'
+                            data_type = type(part.inline_data.data).__name__
+                            print(f"  データ形式: {mime_type}, タイプ: {data_type}")
 
-                        print(f"  画像データサイズ: {len(image_data)} bytes")
-                        image = Image.open(BytesIO(image_data))
+                            # データがすでにバイト列かbase64文字列かを判定
+                            if isinstance(part.inline_data.data, bytes):
+                                # バイト列の場合はそのまま使用
+                                image_data = part.inline_data.data
+                            else:
+                                # 文字列の場合はbase64デコード
+                                image_data = base64.b64decode(part.inline_data.data)
 
-                        # 保存
-                        if output_filename is None:
-                            yaml_file = Path(yaml_path)
-                            output_filename = f"{yaml_file.stem}_generated.png"
+                            print(f"  画像データサイズ: {len(image_data)} bytes")
+                            image = Image.open(BytesIO(image_data))
 
-                        output_path = get_next_output_path(output_filename, session_folder=session_folder)
+                            # 保存（複数生成の場合は番号を付ける）
+                            if output_filename is None:
+                                yaml_file = Path(yaml_path)
+                                base_name = f"{yaml_file.stem}_generated"
+                            else:
+                                base_name = output_filename.replace('.png', '')
 
-                        image.save(output_path)
-                        print(f"\n✓ マンガを保存しました: {output_path}")
-                        print(f"  サイズ: {image.size}")
+                            if count > 1:
+                                filename = f"{base_name}_{i + 1}.png"
+                            else:
+                                filename = f"{base_name}.png"
 
-                        return output_path
+                            output_path = get_next_output_path(filename, session_folder=session_folder)
 
-                    elif hasattr(part, 'text'):
-                        print(f"  テキストレスポンス: {part.text[:200]}")
+                            image.save(output_path)
+                            print(f"✓ マンガを保存しました: {output_path}")
+                            print(f"  サイズ: {image.size}")
 
-        print("⚠ 画像が生成されませんでした")
-        return None
+                            generated_paths.append(output_path)
+                            break
 
-    except Exception as e:
-        print(f"\n✗ API エラー: {type(e).__name__}: {e}")
-        import traceback
-        traceback.print_exc()
+                        elif hasattr(part, 'text'):
+                            print(f"  テキストレスポンス: {part.text[:200]}")
+
+                if not generated_paths or len(generated_paths) <= i:
+                    print("⚠ この回の生成に失敗しました")
+                    errors.append(f"生成 {i + 1}: 画像が生成されませんでした")
+
+        except Exception as e:
+            print(f"\n✗ API エラー ({i + 1}/{count}): {type(e).__name__}: {e}")
+            errors.append(f"生成 {i + 1}: {str(e)}")
+
+    # 結果サマリー
+    if generated_paths:
+        print(f"\n{'=' * 60}")
+        print(f"✓ {len(generated_paths)}/{count} 枚の生成に成功しました")
+        for path in generated_paths:
+            print(f"  - {path}")
+        if errors:
+            print(f"\n失敗: {len(errors)} 件")
+            for err in errors:
+                print(f"  - {err}")
+        print(f"{'=' * 60}")
+        return generated_paths
+    else:
+        print("\n✗ すべての生成に失敗しました")
+        if errors:
+            for err in errors:
+                print(f"  - {err}")
         return None
 
 def main():
@@ -315,6 +505,7 @@ def main():
     parser = argparse.ArgumentParser(description='構造化YAMLからマンガを生成')
     parser.add_argument('yaml_path', help='展開済みYAMLファイルのパス')
     parser.add_argument('--session-folder', type=int, help='セッションフォルダ番号（複数ページを同じフォルダに保存）')
+    parser.add_argument('--count', type=int, default=1, help='生成枚数（1-4、デフォルト1）')
 
     args = parser.parse_args()
 
@@ -323,12 +514,14 @@ def main():
     print("=" * 60)
 
     try:
-        output_path = generate_manga_from_yaml(args.yaml_path, session_folder=args.session_folder)
-        if output_path:
-            print("\n" + "=" * 60)
-            print("  ✓ 生成完了！")
-            print(f"  出力: {output_path}")
-            print("=" * 60)
+        result = generate_manga_from_yaml(
+            args.yaml_path,
+            session_folder=args.session_folder,
+            count=args.count
+        )
+        if result:
+            # 成功時は何もしない（関数内で既に表示済み）
+            pass
         else:
             print("\n✗ 生成に失敗しました")
             sys.exit(1)
