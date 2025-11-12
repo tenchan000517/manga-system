@@ -9,7 +9,7 @@ comic_page:
 
     - ページ全体のアスペクト比は 1:1.4（幅:高さ）を絶対に厳守する。必要に応じて余白やトリミングで合わせる。
 
-    - パネルは3つ。上から順に panel 1, 2, 3 を縦方向に配置する。
+    - パネルは4つ。上から順に panel 1, 2, 3, 4 を縦方向に均等配置する。
 
     - パネルの追加・削除・結合・回転・順序入替えは禁止。与えられた panel.number の順に配置する。
 
@@ -57,57 +57,76 @@ comic_page:
   panels:
   - number: 1
     page_position: top
-    background: 深夜のデスク、モニターにInstagramが映っている
-    description: パソコンの前で腕組みして考え込んでいる
+    background: 明るいオフィス、ホワイトボードが見える
+    description: 指を立てて提案している
     characters:
-    - name: TEN
+    - name: CLAUDECODE
       panel_position: center
-      emotion: troubled, thinking hard, hand on chin
+      emotion: suggesting, one finger raised, helpful gesture
       facing: 右
       shot: バストアップ
-      pose: パソコンの前で腕組みして考え込んでいる
-      description: パソコンの前で腕組みして考え込んでいる
+      pose: 指を立てて提案している
+      description: 指を立てて提案している
       lines:
-      - text: インスタでマンガ投稿したいけど...毎回描くの無理ゲーすぎる
+      - text: ところで、ストーリー作成も自動化できますよ
         char_text_position: left
         type: speech
     effects: []
     monologues: []
     camera_angle: medium shot
   - number: 2
-    page_position: middle
-    background: 画面から飛び出してくる演出
-    description: 元気いっぱい、片手を上げて挨拶
+    page_position: upper-middle
+    background: 明るいデスク周り、ノートPCが開いている
+    description: 目を輝かせて身を乗り出している
     characters:
-    - name: CLAUDECODE
+    - name: TEN
       panel_position: center
-      emotion: suggesting, one finger raised, helpful gesture
+      emotion: surprised, eyes wide, mouth open
       facing: 左
       shot: バストアップ
-      pose: 元気いっぱい、片手を上げて挨拶
-      description: 元気いっぱい、片手を上げて挨拶
+      pose: 目を輝かせて身を乗り出している
+      description: 目を輝かせて身を乗り出している
       lines:
-      - text: それ、AIで自動化できますよ！Google の Nano Banana 知ってます？
+      - text: おお！じゃあキャラクター管理も自動化しよう
         char_text_position: right
         type: speech
     effects: []
     monologues: []
     camera_angle: medium shot
   - number: 3
+    page_position: lower-middle
+    background: 明るい部屋、図解が浮かんでいる演出
+    description: 両手を広げて説明している
+    characters:
+    - name: CLAUDECODE
+      panel_position: center
+      emotion: explaining, gesturing, helpful pose
+      facing: 右
+      shot: バストアップ
+      pose: 両手を広げて説明している
+      description: 両手を広げて説明している
+      lines:
+      - text: レイアウトパターンも動的に生成できますね
+        char_text_position: left
+        type: speech
+    effects: []
+    monologues: []
+    camera_angle: medium shot
+  - number: 4
     page_position: bottom
-    background: 同じデスク
-    description: 目を輝かせて身を乗り出す、メガネがキラリ
+    background: 明るいオフィス、やる気に満ちた雰囲気
+    description: ガッツポーズ、拳を上げている
     characters:
     - name: TEN
       panel_position: center
-      emotion: surprised, eyes wide, mouth open
-      facing: 右
+      emotion: determined, confident, fist clenched
+      facing: 左
       shot: バストアップ
-      pose: 目を輝かせて身を乗り出す、メガネがキラリ
-      description: 目を輝かせて身を乗り出す、メガネがキラリ
+      pose: ガッツポーズ、拳を上げている
+      description: ガッツポーズ、拳を上げている
       lines:
-      - text: マジで!? どうやるの？
-        char_text_position: left
+      - text: いいね！どんどん自動化していこう！
+        char_text_position: right
         type: speech
     effects: []
     monologues: []

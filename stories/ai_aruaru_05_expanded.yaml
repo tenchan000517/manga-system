@@ -9,7 +9,7 @@ comic_page:
 
     - ページ全体のアスペクト比は 1:1.4（幅:高さ）を絶対に厳守する。必要に応じて余白やトリミングで合わせる。
 
-    - パネルは3つ。上から順に panel 1, 2, 3 を縦方向に配置する。
+    - パネルは4つ。上から順に panel 1, 2, 3, 4 を縦方向に均等配置する。
 
     - パネルの追加・削除・結合・回転・順序入替えは禁止。与えられた panel.number の順に配置する。
 
@@ -57,57 +57,76 @@ comic_page:
   panels:
   - number: 1
     page_position: top
-    background: 深夜のデスク、モニターにInstagramが映っている
-    description: パソコンの前で腕組みして考え込んでいる
+    background: 明るいデスク、静寂な雰囲気
+    description: ふと我に返って固まっている
     characters:
     - name: TEN
       panel_position: center
       emotion: troubled, thinking hard, hand on chin
       facing: 右
       shot: バストアップ
-      pose: パソコンの前で腕組みして考え込んでいる
-      description: パソコンの前で腕組みして考え込んでいる
+      pose: ふと我に返って固まっている
+      description: ふと我に返って固まっている
       lines:
-      - text: インスタでマンガ投稿したいけど...毎回描くの無理ゲーすぎる
+      - text: '...'
         char_text_position: left
         type: speech
     effects: []
     monologues: []
     camera_angle: medium shot
   - number: 2
-    page_position: middle
-    background: 画面から飛び出してくる演出
-    description: 元気いっぱい、片手を上げて挨拶
+    page_position: upper-middle
+    background: 明るい部屋、CLAUDECODEが不思議そう
+    description: 首を傾げて心配そうに見ている
     characters:
     - name: CLAUDECODE
       panel_position: center
-      emotion: suggesting, one finger raised, helpful gesture
+      emotion: neutral, standing ready
       facing: 左
       shot: バストアップ
-      pose: 元気いっぱい、片手を上げて挨拶
-      description: 元気いっぱい、片手を上げて挨拶
+      pose: 首を傾げて心配そうに見ている
+      description: 首を傾げて心配そうに見ている
       lines:
-      - text: それ、AIで自動化できますよ！Google の Nano Banana 知ってます？
+      - text: どうしました？
         char_text_position: right
         type: speech
     effects: []
     monologues: []
     camera_angle: medium shot
   - number: 3
-    page_position: bottom
-    background: 同じデスク
-    description: 目を輝かせて身を乗り出す、メガネがキラリ
+    page_position: lower-middle
+    background: 明るいデスク、混乱した雰囲気
+    description: 頭を抱えて困惑している
     characters:
     - name: TEN
       panel_position: center
-      emotion: surprised, eyes wide, mouth open
+      emotion: troubled, thinking hard, hand on chin
       facing: 右
       shot: バストアップ
-      pose: 目を輝かせて身を乗り出す、メガネがキラリ
-      description: 目を輝かせて身を乗り出す、メガネがキラリ
+      pose: 頭を抱えて困惑している
+      description: 頭を抱えて困惑している
       lines:
-      - text: マジで!? どうやるの？
+      - text: あれ...最初って何がしたかったんだっけ？
         char_text_position: left
+        type: speech
+    effects: []
+    monologues: []
+    camera_angle: medium shot
+  - number: 4
+    page_position: bottom
+    background: 明るい部屋、気まずい空気
+    description: 目を逸らして気まずそうにしている
+    characters:
+    - name: CLAUDECODE
+      panel_position: center
+      emotion: neutral, standing ready
+      facing: 左
+      shot: バストアップ
+      pose: 目を逸らして気まずそうにしている
+      description: 目を逸らして気まずそうにしている
+      lines:
+      - text: '...Instagram用の漫画を『簡単に』作る、でしたね'
+        char_text_position: right
         type: speech
     effects: []
     monologues: []

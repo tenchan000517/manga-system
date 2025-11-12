@@ -5,14 +5,23 @@
     python generate_from_yaml.py ../stories/simple_story_example_expanded.yaml
 """
 import sys
+import io
+
+# Windows環境でのUTF-8出力対応
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
 import yaml
 import base64
 import os
+import argparse
 from pathlib import Path
 from PIL import Image
 from io import BytesIO
 import google.generativeai as genai
 from dotenv import load_dotenv
+from datetime import datetime
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CHARACTERS_DIR = PROJECT_ROOT / "characters"
@@ -21,6 +30,58 @@ TEMPLATES_DIR = PROJECT_ROOT / "templates"
 
 # .env読み込み
 load_dotenv(PROJECT_ROOT / ".env")
+
+def get_next_output_path(base_filename, session_folder=None):
+    """年月/日付/ナンバリング形式で次の出力パスを生成
+
+    優先順位:
+    1. session_folder引数（コマンドラインから指定）
+    2. 環境変数 MANGA_SESSION_ID
+    3. 自動採番（既存フォルダの次の番号）
+
+    例: output/2025-11/12/1/story_name_generated.png
+        output/2025-11/12/2/another_story_generated.png
+    """
+    now = datetime.now()
+    year_month = now.strftime("%Y-%m")  # 例: 2025-11
+    day = now.strftime("%d")  # 例: 12
+
+    # 年月/日付フォルダを作成
+    date_dir = OUTPUT_DIR / year_month / day
+
+    # セッションフォルダを決定（優先順位順）
+    if session_folder is not None:
+        # 1. コマンドライン引数
+        folder_id = str(session_folder)
+        output_folder = date_dir / folder_id
+        if not output_folder.exists():
+            output_folder.mkdir(parents=True, exist_ok=True)
+    elif os.getenv('MANGA_SESSION_ID'):
+        # 2. 環境変数
+        folder_id = os.getenv('MANGA_SESSION_ID')
+        output_folder = date_dir / folder_id
+        if not output_folder.exists():
+            output_folder.mkdir(parents=True, exist_ok=True)
+    else:
+        # 3. 自動採番
+        if date_dir.exists():
+            # 既存のナンバリングフォルダを取得（数字のみ）
+            existing_numbers = []
+            for item in date_dir.iterdir():
+                if item.is_dir() and item.name.isdigit():
+                    existing_numbers.append(int(item.name))
+
+            # 次のナンバーを決定
+            next_number = max(existing_numbers) + 1 if existing_numbers else 1
+        else:
+            next_number = 1
+
+        output_folder = date_dir / str(next_number)
+        output_folder.mkdir(parents=True, exist_ok=True)
+
+    # 最終的なパス
+    output_path = output_folder / base_filename
+    return output_path
 
 def load_yaml(filepath):
     """YAMLファイルを読み込む"""
@@ -138,8 +199,14 @@ IMPORTANT:
 
     return full_prompt
 
-def generate_manga_from_yaml(yaml_path, output_filename=None):
-    """YAMLからマンガを生成"""
+def generate_manga_from_yaml(yaml_path, output_filename=None, session_folder=None):
+    """YAMLからマンガを生成
+
+    Args:
+        yaml_path: YAMLファイルのパス
+        output_filename: 出力ファイル名（省略可）
+        session_folder: セッションフォルダ番号（省略可）
+    """
 
     # YAML読み込み
     print(f"📖 YAML読み込み: {yaml_path}")
@@ -223,8 +290,7 @@ def generate_manga_from_yaml(yaml_path, output_filename=None):
                             yaml_file = Path(yaml_path)
                             output_filename = f"{yaml_file.stem}_generated.png"
 
-                        output_path = OUTPUT_DIR / output_filename
-                        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+                        output_path = get_next_output_path(output_filename, session_folder=session_folder)
 
                         image.save(output_path)
                         print(f"\n✓ マンガを保存しました: {output_path}")
@@ -246,18 +312,18 @@ def generate_manga_from_yaml(yaml_path, output_filename=None):
 
 def main():
     """メイン処理"""
-    if len(sys.argv) < 2:
-        print("使い方: python generate_from_yaml.py <expanded_yaml_file>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='構造化YAMLからマンガを生成')
+    parser.add_argument('yaml_path', help='展開済みYAMLファイルのパス')
+    parser.add_argument('--session-folder', type=int, help='セッションフォルダ番号（複数ページを同じフォルダに保存）')
 
-    yaml_path = sys.argv[1]
+    args = parser.parse_args()
 
     print("=" * 60)
     print("  構造化YAML → マンガ生成")
     print("=" * 60)
 
     try:
-        output_path = generate_manga_from_yaml(yaml_path)
+        output_path = generate_manga_from_yaml(args.yaml_path, session_folder=args.session_folder)
         if output_path:
             print("\n" + "=" * 60)
             print("  ✓ 生成完了！")

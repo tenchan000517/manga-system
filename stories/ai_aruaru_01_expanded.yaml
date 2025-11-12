@@ -57,7 +57,7 @@ comic_page:
   panels:
   - number: 1
     page_position: top
-    background: 深夜のデスク、モニターにInstagramが映っている
+    background: 明るいデスク、モニターにInstagramが映っている
     description: パソコンの前で腕組みして考え込んでいる
     characters:
     - name: TEN
@@ -68,7 +68,7 @@ comic_page:
       pose: パソコンの前で腕組みして考え込んでいる
       description: パソコンの前で腕組みして考え込んでいる
       lines:
-      - text: インスタでマンガ投稿したいけど...毎回描くの無理ゲーすぎる
+      - text: Instagram用の漫画を簡単に作りたいんだけど...
         char_text_position: left
         type: speech
     effects: []
@@ -76,18 +76,18 @@ comic_page:
     camera_angle: medium shot
   - number: 2
     page_position: middle
-    background: 画面から飛び出してくる演出
-    description: 元気いっぱい、片手を上げて挨拶
+    background: 明るい画面から飛び出してくる演出
+    description: 元気よく片手を上げて提案している
     characters:
     - name: CLAUDECODE
       panel_position: center
       emotion: suggesting, one finger raised, helpful gesture
       facing: 左
       shot: バストアップ
-      pose: 元気いっぱい、片手を上げて挨拶
-      description: 元気いっぱい、片手を上げて挨拶
+      pose: 元気よく片手を上げて提案している
+      description: 元気よく片手を上げて提案している
       lines:
-      - text: それ、AIで自動化できますよ！Google の Nano Banana 知ってます？
+      - text: いいですね！ストーリーをYAMLで書いて画像生成しましょう
         char_text_position: right
         type: speech
     effects: []
@@ -95,18 +95,18 @@ comic_page:
     camera_angle: medium shot
   - number: 3
     page_position: bottom
-    background: 同じデスク
-    description: 目を輝かせて身を乗り出す、メガネがキラリ
+    background: 明るいデスク
+    description: 前向きな表情で両手を合わせている
     characters:
     - name: TEN
       panel_position: center
-      emotion: surprised, eyes wide, mouth open
+      emotion: happy, smiling brightly, excited
       facing: 右
-      shot: バストアップ
-      pose: 目を輝かせて身を乗り出す、メガネがキラリ
-      description: 目を輝かせて身を乗り出す、メガネがキラリ
+      shot: 顔のクローズアップ
+      pose: 前向きな表情で両手を合わせている
+      description: 前向きな表情で両手を合わせている
       lines:
-      - text: マジで!? どうやるの？
+      - text: シンプルでいいね！これならすぐできそう
         char_text_position: left
         type: speech
     effects: []
