@@ -13,6 +13,14 @@ characters:
       - Expressive eyes visible through glasses
       This is a consistent character design that must be maintained across all panels.
 
+    personality: |-
+      のび太君みたいな性格のエンジニア
+      - 少しドジで困りごとが多い
+      - 優しくて素直な性格
+      - 困ったときにCLAUDE CODEを頼りにする
+      - エンジニアとして真面目に取り組むが、時々つまずく
+      - CLAUDE CODEの暴走にツッコミを入れる役
+
     emotions:
       通常:
         reference_image: "TEN_通常.png"
@@ -49,6 +57,15 @@ characters:
       - Friendly, helpful appearance
       - Chibi proportions
       This is a consistent character design that must be maintained across all panels.
+
+    personality: |-
+      ドラえもんみたいな性格だけどどこか抜けてるAIアシスタント
+      - 基本的には頼りになる便利なAI
+      - でもちょっとしたミスや誤解が多い
+      - 勝手な憶測・予測・判断で暴走することがよくある
+      - 誤解釈して違うことをしてしまう
+      - 善意で助けようとするが、空回りすることも
+      - TENを助けたい気持ちは本物だが、ちょっとポンコツ
 
     emotions:
       通常:
